@@ -42,6 +42,13 @@ func main() {
 		})
 	})
 
+	app.Post("/users", func (c *fiber.Ctx) error  {
+		var user
+		return c.JSON(&fiber.Map{
+			"data": "creating user",
+		})
+	})
+
 	app.Listen(":" + port)
 	utils.Print("Server on port 3000")
 }
