@@ -11,7 +11,10 @@ function App() {
     e.preventDefault()
     const response = await fetch(import.meta.env.VITE_API + '/users', {
       method: 'POST',
-      body: JSON.stringify({name})
+      body: JSON.stringify({name}),
+      headers: {
+        "Content-Type": "application/json"
+      }
     })
     const data = await response.json()
     console.log(data);

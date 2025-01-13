@@ -6,6 +6,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/morjuax/go-react-crud/models"
 	"github.com/morjuax/go-react-crud/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -26,26 +27,54 @@ func main() {
 		panic(err)
 	}
 
-	coll := client.Database("gomongodb").Collection("users")
-	coll.InsertOne(context.TODO(), bson.D{{
-		Key: "name", 
-		Value: "morjuax",
-	}})
-
 	app.Static("/", "./client/dist")
 
 	app.Use(cors.New())
 
-	app.Get("/users", func (c *fiber.Ctx) error  {
+	// app.Get("/users", func (c *fiber.Ctx) error  {
+	// 	return c.JSON(&fiber.Map{
+	// 		"data": "users from backend",
+	// 	})
+	// })
+
+	app.Post("/users", func (c *fiber.Ctx) error  {
+		var user models.User
+
+		c.BodyParser(&user)
+
+		
+		coll := client.Database("gomongodb").Collection("users")
+		result, err := coll.InsertOne(context.TODO(), bson.D{{
+			Key: "name", 
+			Value: user.Name,
+		}})
+
+		if err != nil {
+			panic(err)
+		}
+
+
 		return c.JSON(&fiber.Map{
-			"data": "users from backend",
+			"data": result,
 		})
 	})
 
-	app.Post("/users", func (c *fiber.Ctx) error  {
-		var user
+	app.Get("/users", func (c *fiber.Ctx) error  {
+		var users []models.User
+
+		coll := client.Database("gomongodb").Collection("users")
+		results, err := coll.Find(context.TODO(), bson.M{})
+
+		if err != nil {
+			panic(err)
+		}
+		for results.Next(context.TODO()) {
+			var user models.User
+			results.Decode(&user)
+			users = append(users, user)
+		}
 		return c.JSON(&fiber.Map{
-			"data": "creating user",
+			"users": users,
 		})
 	})
 
