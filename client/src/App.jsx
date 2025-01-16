@@ -1,10 +1,22 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 
 
 function App() {
 
   const [name, setName] = useState('')
+  const [users, setUsers] = useState([])
+
+  async function loadUsers() {
+    const response = await fetch(import.meta.env.VITE_API + '/users')
+    const data = await response.json()
+    console.log(data)
+    setUsers(data.users);
+   }
+
+  useEffect(() => {
+   loadUsers()
+  }, [])
 
 
   const handleSubmit = async (e) => {
@@ -18,7 +30,7 @@ function App() {
     })
     const data = await response.json()
     console.log(data);
-    
+    loadUsers()
   }
 
   return (
@@ -30,6 +42,11 @@ function App() {
         onChange={(e) => setName(e.target.value)} />
         <button>Save</button>
       </form>
+      <ul>
+        {users.map(user => (
+          <li key={user._id}>{user.name}</li>
+        ))}
+      </ul>
     </div>
   )
 }
