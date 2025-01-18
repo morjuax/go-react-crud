@@ -22,13 +22,19 @@ func main() {
 
 
 	port := os.Getenv("PORT")
+	mongodb := os.Getenv("MONGODB_URI")
+	
 	if port == "" {
 		port = "3000"
 	} 
+	
+	if mongodb == "" {
+		mongodb = "mongodb://localhost:27017/gomongodb"
+	}
 
 	app := fiber.New()
 	
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(os.Getenv("MONGODB_DATABASE")))
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(mongodb))
 
 	if err != nil {
 		panic(err)
