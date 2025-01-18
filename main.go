@@ -11,9 +11,16 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	err := godotenv.Load()
+    if err != nil {
+        utils.Print("Error cargando archivo .env: ", err)
+    }
+
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "3000"
@@ -21,7 +28,7 @@ func main() {
 
 	app := fiber.New()
 	
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb://localhost:27017/gomongodb"))
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(os.Getenv("MONGODB_DATABASE")))
 
 	if err != nil {
 		panic(err)
